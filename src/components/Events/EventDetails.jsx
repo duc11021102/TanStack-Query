@@ -10,9 +10,9 @@ import Modal from "../UI/Modal.jsx";
 export default function EventDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // const [loading, setLoading] = useState(false);
   const [isModal, setIsModal] = useState(false);
 
+  //QUERY 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["events", id],
     queryFn: ({ signal }) => fetchEvent({ signal, id: id }),
@@ -25,6 +25,7 @@ export default function EventDetails() {
   } = useMutation({
     mutationFn: deleteEvent,
     onSuccess: () => {
+      // QUERYCLIENT.INVALIDATEQUERIES ĐÁNH DẤU CÁC QUERIES KEY LÀ LỖI THỜI, VÀ SẼ LÀM MỚI LẠI CHÚNG KHI TRUY CẬP LẠI
       queryClient.invalidateQueries({
         queryKey: ["events"],
         refetchType: "none",
@@ -67,7 +68,7 @@ export default function EventDetails() {
           </nav>
         </header>
         <div id="event-details-content">
-          <img src={`http://localhost:3000/${data.image}`} alt="" />
+          <img src={`http://localhost:3001/${data.image}`} alt="" />
           <div id="event-details-info">
             <div>
               <p id="event-details-location">{data.location}</p>
