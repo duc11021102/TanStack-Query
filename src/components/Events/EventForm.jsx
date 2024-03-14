@@ -3,10 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchSelectableImages } from "../../util/http.js";
 import ImagePicker from "../ImagePicker.jsx";
 import ErrorBlock from "../UI/ErrorBlock.jsx";
+import { useForm } from "react-hook-form"
 
 export default function EventForm({ inputData, onSubmit, children }) {
+  //STORE
   const [selectedImage, setSelectedImage] = useState(inputData?.image);
+  //VALIDATE FORM
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm()
 
+  //QUERY
   const { data, isPending, isError } = useQuery({
     queryKey: ["events-images"],
     queryFn: fetchSelectableImages,
@@ -16,25 +26,25 @@ export default function EventForm({ inputData, onSubmit, children }) {
     setSelectedImage(image);
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData);
-
-    onSubmit({ ...data, image: selectedImage });
+  function handlerSubmit(event) {
+    console.log({ ...event, image: selectedImage })
+    onSubmit({ ...event, image: selectedImage });
   }
 
   return (
-    <form id="event-form" onSubmit={handleSubmit}>
+    <form id="event-form" onSubmit={handleSubmit(handlerSubmit)}>
       <p className="control">
         <label htmlFor="title">Title</label>
         <input
           type="text"
           id="title"
           name="title"
+          {...register("title", { required: true, maxLength: 40 })}
           defaultValue={inputData?.title ?? ""}
         />
+        {!!errors.title && (
+          <span  className="error-text">Title cannot be blank and must not exceed 40 characters</span>
+        )}
       </p>
       {isPending && <p>Loading selectable images...</p>}
       {isError && (
@@ -58,8 +68,12 @@ export default function EventForm({ inputData, onSubmit, children }) {
         <textarea
           id="description"
           name="description"
+          {...register("description" , {required : true})}
           defaultValue={inputData?.description ?? ""}
         />
+        {!!errors.description && (
+          <span  className="error-text">Description cannot be blank</span>
+        )}
       </p>
 
       <div className="controls-row">
@@ -69,7 +83,8 @@ export default function EventForm({ inputData, onSubmit, children }) {
             type="date"
             id="date"
             name="date"
-            defaultValue={inputData?.date ?? ""}
+            {...register("date")}
+            defaultValue={inputData?.date ?? "2024-03-05"}
           />
         </p>
 
@@ -79,7 +94,8 @@ export default function EventForm({ inputData, onSubmit, children }) {
             type="time"
             id="time"
             name="time"
-            defaultValue={inputData?.time ?? ""}
+            {...register("time")}
+            defaultValue={inputData?.time ?? "12:12"}
           />
         </p>
       </div>
@@ -90,8 +106,12 @@ export default function EventForm({ inputData, onSubmit, children }) {
           type="text"
           id="location"
           name="location"
+          {...register("location" , {required : true , maxLength: 20})}
           defaultValue={inputData?.location ?? ""}
         />
+        {!!errors.location && (
+          <span className="error-text">Location cannot be blank and must not exceed 20 characters</span>
+        )}
       </p>
 
       <p className="form-actions">{children}</p>

@@ -2,14 +2,18 @@ import axios from "axios";
 import { QueryClient } from "@tanstack/react-query";
 // import { toastSuccessCreate } from "../components/UI/Toast";
 export const queryClient = new QueryClient();
-export async function fetchEvents({ signal, searchTerm }) {
+export async function fetchEvents({ signal, searchTerm , max}) {
     //signal dùng để hủy request khi request k cần thiết nữa 
     //khi có signal thì chỉ request đối với request có signal 
-    let url = 'http://localhost:3001/events';
+    let url = '/api/events';
 
-    if (searchTerm) {
-        url += '?search=' + searchTerm
-    }
+    if (searchTerm && max) {
+        url += '?search=' + searchTerm + '&max=' + max;
+      } else if (searchTerm) {
+        url += '?search=' + searchTerm;
+      } else if (max) {
+        url += '?max=' + max
+      }
     try {
         const { data } = await axios.get(url, { signal: signal });
         return data.events
@@ -20,7 +24,7 @@ export async function fetchEvents({ signal, searchTerm }) {
 }
 
 export async function createNewEvent(eventData) {
-    const response = await fetch(`http://localhost:3001/events`, {
+    const response = await fetch(`/api/events`, {
         method: 'POST',
         body: JSON.stringify(eventData),
         headers: {
@@ -41,7 +45,7 @@ export async function createNewEvent(eventData) {
 }
 
 export async function fetchEvent({ id, signal }) {
-    const response = await fetch(`http://localhost:3001/events/${id}`, { signal });
+    const response = await fetch(`/api/events/${id}`, { signal });
 
     if (!response.ok) {
         const error = new Error('An error occurred while fetching the event');
@@ -56,7 +60,7 @@ export async function fetchEvent({ id, signal }) {
 }
 
 export async function deleteEvent({ id }) {
-    const response = await fetch(`http://localhost:3001/events/${id}`, {
+    const response = await fetch(`/api/events/${id}`, {
         method: 'DELETE',
     });
 
@@ -73,7 +77,7 @@ export async function deleteEvent({ id }) {
 
 export async function updateEvent({ id, event }) {
     try {
-        const response = await axios.put(`http://localhost:3001/events/${id}`, { event }, {
+        const response = await axios.put(`/api/events/${id}`, { event }, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -97,7 +101,7 @@ export async function updateEvent({ id, event }) {
 
 export async function fetchSelectableImages({ signal }) {
     try {
-        const { data } = await axios.get(`http://localhost:3001/events/images`, { signal })
+        const { data } = await axios.get(`/api/events/images`, { signal })
         console.log("RESS:", data.images)
         return data.images
     } catch (error) {

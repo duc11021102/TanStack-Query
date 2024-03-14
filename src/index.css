@@ -367,7 +367,9 @@ ul {
 .button-text:hover {
   color: #7c184c;
 }
-
+.error-text {
+  color: #e30d7c;
+}
 .error-block {
   background-color: #f0d9e5;
   margin: 1rem 0;

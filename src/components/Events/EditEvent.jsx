@@ -6,17 +6,21 @@ import EventForm from "./EventForm.jsx";
 import Modal from "../UI/Modal.jsx";
 import LoadingIndicator from "../UI/LoadingIndicator.jsx";
 import ErrorBlock from "../UI/ErrorBlock.jsx";
+import { toastSuccessEdit, toastErrorEdit } from "../UI/Toast.jsx";
 export default function EditEvent() {
   //STORE
   const navigate = useNavigate();
   const { id } = useParams();
-  //QUERY
+
+  //QUERY GET DETAIL EVENT
   //USE SIGNAL TO CANCELLATION FETCH {SIGNAL AND CANCELQUERIES}
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["events", id],
-    queryFn: ({ signal }) => fetchEvent({ signal, id: id })
+    queryFn: ({ signal }) => fetchEvent({ signal, id: id }),
+    staleTime: 5000,
   });
 
+  //MUTATE UPDATE EVENTS
   const { mutate } = useMutation({
     mutationFn: updateEvent,
     // WHEN MUTATE IS CALLED:
@@ -35,6 +39,10 @@ export default function EditEvent() {
     // IF THE MUTATION FAILS, USE THE CONTEXT WE RETURNED ABOVE
     onError: (error, data, context) => {
       queryClient.setQueryData(['events', id], context.previousEvent);
+      toastErrorEdit();
+    },
+    onSuccess: () => {
+      toastSuccessEdit();
     },
     // ALWAYS REFETCH AFTER ERROR OR SUCCESS:
     onSettled: () => {
@@ -49,6 +57,7 @@ export default function EditEvent() {
     mutate({id: id, event: formData})
     navigate('../');
    }
+  
   // CLOSE BACK
   function handleClose() {
     navigate("../");

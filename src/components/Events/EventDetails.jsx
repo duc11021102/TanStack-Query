@@ -16,6 +16,7 @@ export default function EventDetails() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["events", id],
     queryFn: ({ signal }) => fetchEvent({ signal, id: id }),
+    staleTime: 5000,
   });
 
   const {
