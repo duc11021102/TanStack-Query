@@ -1,8 +1,8 @@
-import LoadingIndicator from "../UI/LoadingIndicator.jsx";
-import ErrorBlock from "../UI/ErrorBlock.jsx";
+import LoadingIndicator from "../../containers/UI/LoadingIndicator.jsx";
+import ErrorBlock from "../../containers/UI/ErrorBlock.jsx";
 import EventItem from "./EventItem.jsx";
 import { useQuery } from "@tanstack/react-query";
-import { fetchEvents } from "../../util/http.js";
+import { fetchEvents } from "../../../util/http.js";
 import { useState, useReducer } from "react";
 
 const initialState = {
@@ -33,6 +33,7 @@ export default function NewEventsSection() {
     staleTime: 5000,
     // XÁC ĐỊNH KHOẢNG THỜI GIAN TRẢI QUA SAU KHI DỮ LIỆU ĐƯỢC COI LÀ CŨ, SAU 5 GIÂY TỪ KHI DỮ LIỆU MỚI NHẤT ĐƯỢC GỌI NẾU NGƯỜI DÙNG
     // RỜI TRANG VÀ QUAY LẠI TRANG THÌ DỮ LIỆU SẼ ĐƯỢC GỌI LẠI
+    retry: 3 // WILL RETRY FAILED REQUESTS 3 TIMES BEFORE DISPLAYING AN ERROR
   });
   let content;
 
@@ -67,7 +68,7 @@ export default function NewEventsSection() {
         <h2>Recently added events</h2>
         {!isShowAll ? <button onClick={() => {
           setIsShowAll(true)
-          dispatch({ type: "SET_MAX", payload: 100 })
+          dispatch({ type: "SET_MAX", payload: "all" })
         }} className="button">Show all events</button> : <button onClick={() => {
           setIsShowAll(false)
           dispatch({ type: "SET_MAX", payload: 3 })

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSelectableImages } from "../../util/http.js";
-import ImagePicker from "../ImagePicker.jsx";
-import ErrorBlock from "../UI/ErrorBlock.jsx";
+import { fetchSelectableImages } from "../../../util/http.js";
+import ImagePicker from "../../containers/Layout/ImagePicker.jsx";
+import ErrorBlock from "../../containers/UI/ErrorBlock.jsx";
 import { useForm } from "react-hook-form"
 
 export default function EventForm({ inputData, onSubmit, children }) {
@@ -43,7 +43,7 @@ export default function EventForm({ inputData, onSubmit, children }) {
           defaultValue={inputData?.title ?? ""}
         />
         {!!errors.title && (
-          <span  className="error-text">Title cannot be blank and must not exceed 40 characters</span>
+          <span className="error-text">Title cannot be blank and must not exceed 40 characters</span>
         )}
       </p>
       {isPending && <p>Loading selectable images...</p>}
@@ -68,11 +68,11 @@ export default function EventForm({ inputData, onSubmit, children }) {
         <textarea
           id="description"
           name="description"
-          {...register("description" , {required : true})}
+          {...register("description", { required: true })}
           defaultValue={inputData?.description ?? ""}
         />
         {!!errors.description && (
-          <span  className="error-text">Description cannot be blank</span>
+          <span className="error-text">Description cannot be blank</span>
         )}
       </p>
 
@@ -106,7 +106,7 @@ export default function EventForm({ inputData, onSubmit, children }) {
           type="text"
           id="location"
           name="location"
-          {...register("location" , {required : true , maxLength: 20})}
+          {...register("location", { required: true, maxLength: 20 })}
           defaultValue={inputData?.location ?? ""}
         />
         {!!errors.location && (

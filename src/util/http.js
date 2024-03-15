@@ -1,77 +1,91 @@
 import axios from "axios";
 import { QueryClient } from "@tanstack/react-query";
-// import { toastSuccessCreate } from "../components/UI/Toast";
 export const queryClient = new QueryClient();
-export async function fetchEvents({ signal, searchTerm , max}) {
-    //signal dùng để hủy request khi request k cần thiết nữa 
-    //khi có signal thì chỉ request đối với request có signal 
+export async function fetchEvents({ signal, searchTerm, max }) {
+    //SIGNAL DÙNG ĐỂ HỦY REQUEST KHI REQUEST K CẦN THIẾT NỮA 
+    //KHI CÓ SIGNAL THÌ CHỈ REQUEST ĐỐI VỚI REQUEST CÓ SIGNAL 
     let url = '/api/events';
 
     if (searchTerm && max) {
         url += '?search=' + searchTerm + '&max=' + max;
-      } else if (searchTerm) {
+    } else if (searchTerm) {
         url += '?search=' + searchTerm;
-      } else if (max) {
+    } else if (max) {
         url += '?max=' + max
-      }
+    }
     try {
         const { data } = await axios.get(url, { signal: signal });
         return data.events
     } catch (error) {
-        // console.log("ERROR", error.message)
         return error
     }
 }
 
-export async function createNewEvent(eventData) {
-    const response = await fetch(`/api/events`, {
-        method: 'POST',
-        body: JSON.stringify(eventData),
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
+export async function createNewEvent(event) {
+    try {
+        const { data } = await axios.post('/api/events', event, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-    if (!response.ok) {
-        const error = new Error('An error occurred while creating the event');
-        error.code = response.status;
-        error.info = await response.json();
-        throw error;
+        return data.event;
+    } catch (error) {
+        if (error.response) {
+            // LỖI TỪ SERVER VỚI MÃ STATUS CODE
+            const errorMessage = error.response.data.message || 'An error occurred while creating the event';
+            throw new Error(errorMessage);
+        } else if (error.request) {
+            // LỖI KHÔNG NHẬN ĐƯỢC PHẢN HỒI TỪ SERVER
+            throw new Error('No response received from server');
+        } else {
+            // LỖI KHI THIẾT LẬP YÊU CẦU
+            throw new Error('Error setting up request');
+        }
     }
-
-    const { event } = await response.json();
-    // toastSuccessCreate();
-    return event;
 }
+
 
 export async function fetchEvent({ id, signal }) {
-    const response = await fetch(`/api/events/${id}`, { signal });
-
-    if (!response.ok) {
-        const error = new Error('An error occurred while fetching the event');
-        error.code = response.status;
-        error.info = await response.json();
-        throw error;
+    try {
+        const { data } = await axios.get(`/api/events/${id}`, { signal })
+        console.log(data)
+        return data.event
+    } catch (error) {
+        if (error.response) {
+            // LỖI TỪ SERVER VỚI MÃ STATUS CODE
+            const errorMessage = error.response.data.message || 'An error occurred while get the event';
+            throw new Error(errorMessage);
+        } else if (error.request) {
+            // LỖI KHÔNG NHẬN ĐƯỢC PHẢN HỒI TỪ SERVER
+            throw new Error('No response received from server');
+        } else {
+            // LỖI KHI THIẾT LẬP YÊU CẦU
+            throw new Error('Error');
+        }
     }
-
-    const { event } = await response.json();
-
-    return event;
 }
 
+
+
+
 export async function deleteEvent({ id }) {
-    const response = await fetch(`/api/events/${id}`, {
-        method: 'DELETE',
-    });
-
-    if (!response.ok) {
-        const error = new Error('An error occurred while deleting the event');
-        error.code = response.status;
-        error.info = await response.json();
-        throw error;
+    try {
+        const { data } = await axios.delete(`/api/events/${id}`)
+        return data
+    } catch (error) {
+        if (error.response) {
+            // LỖI TỪ SERVER VỚI MÃ STATUS CODE
+            const errorMessage = error.response.data.message || 'An error occurred while delete the event';
+            throw new Error(errorMessage);
+        } else if (error.request) {
+            // LỖI KHÔNG NHẬN ĐƯỢC PHẢN HỒI TỪ SERVER
+            throw new Error('No response received from server');
+        } else {
+            // LỖI KHI THIẾT LẬP YÊU CẦU
+            throw new Error('Error');
+        }
     }
-
-    return response.json();
 }
 
 
